@@ -1,6 +1,7 @@
 ##### users #####
 create table `users` (
 	`id` int(11) unsigned not null auto_increment,
+	`outlet_id` int(11) unsigned null,
 	`username` varchar(100) not null,
 	`password` varchar(100) not null,
 	`name` varchar(150) not null,
@@ -14,6 +15,7 @@ create table `users` (
 	`deleted_at` datetime default null,
 	`deleted_by` int(11) unsigned default null,
 	primary key (`id`),
+	foreign key (`outlet_id`) references `outlets`(`id`),
 	unique key `username` (`username`),
 	unique key `phone_number` (`phone_number`),
 	index (`is_active`)
@@ -33,15 +35,6 @@ create table outlets (
 	`deleted_by` int(11) unsigned null,
 	primary key (`id`),
 	index (`is_active`)
-) ENGINE = InnoDB default CHARSET = utf8mb4;
-
-##### outlets #####
-create table `outlet_user` (
- 	`outlet_id` int(11) unsigned not null,
- 	`user_id` int(11) unsigned not null,
-  	primary key (`outlet_id`,`user_id`),
-  	foreign key (`user_id`) references `users` (`id`) on delete cascade on update cascade, 
-  	foreign key (`outlet_id`) references `outlets` (`id`) on delete cascade on update cascade
 ) ENGINE = InnoDB default CHARSET = utf8mb4;
 
 ##### categories #####
