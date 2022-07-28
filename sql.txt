@@ -90,8 +90,8 @@ create table outlet_product (
 	`deleted_at` datetime null,
 	`deleted_by` int(11) unsigned null,
 	primary key (`outlet_id`,`product_id`),
-	foreign key (`outlet_id`) references `outlets` (`id`) on delete cascade on update cascade, 
-  	foreign key (`product_id`) references `products` (`id`) on delete cascade on update cascade
+	foreign key (`outlet_id`) references `outlets` (`id`), 
+  	foreign key (`product_id`) references `products` (`id`)
 ) ENGINE = InnoDB default CHARSET = utf8mb4;
 
 
@@ -116,15 +116,16 @@ create table transactions (
 	`deleted_at` datetime null,
 	`deleted_by` int(11) unsigned null,
 	primary key (`id`),
-	foreign key (`outlet_id`) references `outlets` (`id`) on delete cascade on update cascade, 
-  	foreign key (`user_id`) references `users` (`id`) on delete cascade on update cascade
+	foreign key (`outlet_id`) references `outlets` (`id`), 
+  	foreign key (`user_id`) references `users` (`id`)
 ) ENGINE = InnoDB default CHARSET = utf8mb4;
 
 ##### transaction_details #####
-create table transactions (
+create table transaction_details (
 	`id` int(11) unsigned auto_increment not null,
 	`transaction_id` int(11) unsigned not null,
 	`product_id` int(11) unsigned not null,
+	`product_name` varchar(100) not null,
 	`quantity` int(11) unsigned not null default 0,
 	`price` decimal(10,2) unsigned not null default 0,
 	`created_at` datetime not null default current_timestamp,
@@ -134,6 +135,6 @@ create table transactions (
 	`deleted_at` datetime null,
 	`deleted_by` int(11) unsigned null,
 	primary key (`id`),
-	foreign key (`transaction_id`) references `transactions` (`id`) on delete cascade on update cascade, 
-  	foreign key (`product_id`) references `products` (`id`) on delete cascade on update cascade
+	foreign key (`transaction_id`) references `transactions` (`id`), 
+  	foreign key (`product_id`) references `products` (`id`)
 ) ENGINE = InnoDB default CHARSET = utf8mb4;
