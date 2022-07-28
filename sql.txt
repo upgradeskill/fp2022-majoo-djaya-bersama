@@ -15,7 +15,8 @@ create table `users` (
 	`deleted_by` int(11) unsigned default null,
 	primary key (`id`),
 	unique key `username` (`username`),
-	unique key `phone_number` (`phone_number`)
+	unique key `phone_number` (`phone_number`),
+	index (`is_active`)
 ) ENGINE = InnoDB default CHARSET = utf8mb4;
 
 ##### outlets #####
@@ -30,7 +31,8 @@ create table outlets (
 	`updated_by` int(11) unsigned null,
 	`deleted_at` datetime null,
 	`deleted_by` int(11) unsigned null,
-	primary key (`id`)
+	primary key (`id`),
+	index (`is_active`)
 ) ENGINE = InnoDB default CHARSET = utf8mb4;
 
 ##### outlets #####
@@ -54,7 +56,8 @@ create table categories (
 	`updated_by` int(11) unsigned null,
 	`deleted_at` datetime null,
 	`deleted_by` int(11) unsigned null,
-	primary key (`id`)
+	primary key (`id`),
+	index (`is_active`)
 ) ENGINE = InnoDB default CHARSET = utf8mb4;
 
 ##### products #####
@@ -72,7 +75,8 @@ create table products (
 	`deleted_at` datetime null,
 	`deleted_by` int(11) unsigned null,
 	primary key (`id`),
-	foreign key (`category_id`) references `categories`(`id`) on delete cascade on update cascade
+	foreign key (`category_id`) references `categories`(`id`),
+	index (`is_active`)
 ) ENGINE = InnoDB default CHARSET = utf8mb4;
 
 
@@ -91,7 +95,8 @@ create table outlet_product (
 	`deleted_by` int(11) unsigned null,
 	primary key (`outlet_id`,`product_id`),
 	foreign key (`outlet_id`) references `outlets` (`id`), 
-  	foreign key (`product_id`) references `products` (`id`)
+  	foreign key (`product_id`) references `products` (`id`),
+	index (`is_active`)
 ) ENGINE = InnoDB default CHARSET = utf8mb4;
 
 
