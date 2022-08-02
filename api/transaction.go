@@ -22,6 +22,7 @@ func NewTransactionHandler() *TransactionHandler {
 
 func TransactionApi(e *echo.Group) {
 	transactionHandler := NewTransactionHandler()
+	e.GET("/transaction", transactionHandler.TransactionGet)
 	e.POST("/transaction", transactionHandler.TransactionInsert)
 }
 
@@ -34,6 +35,20 @@ func (hand *TransactionHandler) TransactionInsert(c echo.Context) error {
 		resp["error_validation"] = validate
 		return c.JSON(http.StatusBadRequest, resp)
 	}
+
+	if err != nil {
+		resp["message"] = err.Error()
+		return c.JSON(http.StatusNotFound, resp)
+	}
+
+	resp["message"] = "Success"
+	resp["data"] = data
+	return c.JSON(http.StatusOK, resp)
+}
+
+func (hand *TransactionHandler) TransactionGet(c echo.Context) error {
+	resp := make(map[string]interface{})
+	data, err := hand.transactionUseCase.GetAll(c)
 
 	if err != nil {
 		resp["message"] = err.Error()

@@ -75,6 +75,13 @@ func (uc *userUseCase) Login(ctx echo.Context) (dto.LoginResponse, []dto.Validat
 		return dto.LoginResponse{}, nil, errors.New("failed to generate token")
 	}
 
+	// save logged user into session
+	session, _ := util.SessionStore.Get(ctx.Request(), util.SESSION_ID)
+	session.Values["user_id"] = user.Id
+	session.Values["is_role"] = user.IsRole
+	session.Values["username"] = user.Username
+	session.Save(ctx.Request(), ctx.Response())
+
 	return response, nil, nil
 
 }

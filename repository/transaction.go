@@ -37,7 +37,7 @@ func (repo *transactionRepo) InsertDetail(payload dto.TransactionDetail) (data d
 }
 
 func (repo *transactionRepo) GetAll(payload dto.Transaction, pagination dto.Pagination) (data []dto.Transaction, err error) {
-	err = pagination.Apply(repo.DB).Preload("Outlet").Find(&data, payload).Error
+	err = pagination.Apply(repo.DB).Find(&data, payload).Error
 	return
 }
 
