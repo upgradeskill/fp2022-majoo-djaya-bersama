@@ -62,18 +62,6 @@ func (uc *transactionUseCase) Insert(ctx echo.Context) (data dto.TransactionPayl
 }
 
 func (uc *transactionUseCase) GetAll(ctx echo.Context) (data []dto.Transaction, err error) {
-	// TODO: get from userID
-
-	// var filter dto.InventoryIssue
-	// ctx.ShouldBind(&filter)
-	// pagination := dto.InitPagination()
-	// ctx.ShouldBind(&pagination)
-	// data, err := controller.inventoryIssueService.SelectAll(filter, pagination)
-	// if err != nil {
-	// 	fmt.Println("Error : " + err.Error())
-	// }
-	// return data
-
 	var filter dto.Transaction
 	if err = ctx.Bind(&filter); err != nil {
 		return
