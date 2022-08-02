@@ -12,15 +12,15 @@ type User struct {
 	Name        string `json:"name"`
 	PhoneNumber string `json:"phone_number"`
 	IsRole      int    `json:"is_role"`
-	IsActive    int    `json:"is_active"`
+	IsActive
 }
 
 type LoginResponse struct {
 	Username string `json:"username"`
 	Name     string `json:"name"`
 	IsRole   int    `json:"is_role"`
-	IsActive int    `json:"is_active"`
-	Token    string `json:"token"`
+	IsActive
+	Token string `json:"token"`
 	// TokenRefresh string `json:"token_refresh"`
 }
 

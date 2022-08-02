@@ -105,7 +105,7 @@ func (uc *userUseCase) Register(ctx echo.Context) (dto.User, []dto.ValidationMes
 		invalidParameter = append(invalidParameter, dto.ValidationMessage{Parameter: "phone_number", Message: "password is required"})
 	}
 
-	payload.IsActive = 1
+	payload.IsActive = dto.IsActive{IsActive: 1}
 	payload.IsRole = 1
 
 	if len(invalidParameter) > 0 {
@@ -179,7 +179,7 @@ func (uc *userUseCase) UserInsert(ctx echo.Context, claims *dto.UserClaims) (dto
 		return dto.User{}, invalidParameter, nil
 	}
 
-	payload.IsActive = 1
+	payload.IsActive = dto.IsActive{IsActive: 1}
 	payload.CreatedBy = claims.Id
 
 	if payload.Password != "" {
@@ -248,7 +248,7 @@ func (uc *userUseCase) UserUpdate(ctx echo.Context, claims *dto.UserClaims) (dto
 		return dto.User{}, invalidParameter, nil
 	}
 
-	payload.IsActive = 1
+	payload.IsActive = dto.IsActive{IsActive: 1}
 	payload.CreatedBy = claims.Id
 
 	if payload.Password != "" {

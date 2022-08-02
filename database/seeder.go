@@ -4,10 +4,16 @@ import (
 	"errors"
 	"mini-pos/dto"
 	"mini-pos/util"
+
+	"github.com/shopspring/decimal"
 )
 
 func initSeeder() error {
 	userSeeder()
+	outletSeeder()
+	categorySeeder()
+	productSeeder()
+	outletProductSeeder()
 	return nil
 }
 
@@ -20,12 +26,71 @@ func userSeeder() error {
 		PhoneNumber: "0812365444",
 		Password:    pass,
 		IsRole:      1,
-		IsActive:    1,
+		IsActive:    dto.IsActive{IsActive: 1},
 	}
 
 	err := DB.Create(&user).Error // add user data to database
 	if err != nil {
 		return errors.New("failed to seed user data")
 	}
+	return nil
+}
+
+func outletSeeder() error {
+	outlet := dto.Outlet{
+		Name:     "Outlet Name",
+		Address:  "Address",
+		IsActive: dto.IsActive{IsActive: 1},
+	}
+	err := DB.Create(&outlet).Error
+	if err != nil {
+		return errors.New("failed to seed outlet data")
+	}
+	return nil
+}
+
+func categorySeeder() error {
+	category := dto.Category{
+		Name:        "Item Category Test",
+		Description: "",
+		IsActive:    dto.IsActive{IsActive: 1},
+	}
+	err := DB.Create(&category).Error
+	if err != nil {
+		return errors.New("failed to seed user data")
+	}
+
+	return nil
+}
+
+func productSeeder() error {
+	product := dto.Product{
+		CategoryID:  1,
+		Name:        "Product Test",
+		Description: "",
+		ImagePath:   "",
+		IsActive:    dto.IsActive{IsActive: 1},
+	}
+	err := DB.Create(&product).Error
+	if err != nil {
+		return errors.New("failed to seed product data")
+	}
+
+	return nil
+}
+
+func outletProductSeeder() error {
+	outletProduct := dto.OutletProduct{
+		OutletID:  1,
+		ProductID: 1,
+		Stock:     1000,
+		Price:     decimal.NewFromInt(5000),
+		IsActive:  dto.IsActive{IsActive: 1},
+	}
+	err := DB.Create(&outletProduct).Error
+	if err != nil {
+		return errors.New("failed to seed outlet product data")
+	}
+
 	return nil
 }
