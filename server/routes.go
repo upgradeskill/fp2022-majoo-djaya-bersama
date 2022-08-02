@@ -18,6 +18,7 @@ func RegisterRoutes() {
 
 	// for public (unauthorized user)
 	{
+		api.TransactionApi(v1)
 		api.Authorization(v1)
 	}
 

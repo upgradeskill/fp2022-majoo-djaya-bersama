@@ -1,3 +1,33 @@
-[![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-c66648af7eb3fe8bc4f294546bfd86ef473780cde1dea487d3c4ff354943c9ae.svg)](https://classroom.github.com/online_ide?assignment_repo_id=8169127&assignment_repo_type=AssignmentRepo)
-# empty
-Empty repo for github classroom starter
+# Majoo Golang Bootcamp
+
+## Setup project
+ - Clone project
+ - Run command
+    ```
+    go mod tidy
+    ```
+
+## Run project
+
+ - Go to root folder
+ - Run command
+    ```
+    go run ./cmd/main.go
+    ```
+- Server will run in `localhost:8000`
+
+## API List
+ - User
+    - POST v1/login
+    - POST v1/register
+    - POST v1/user
+    - PUT v1/user
+    - DELETE v1/user/:ID
+ - Outlet
+ - Category
+ - Product
+ - Transaction
+    - GET v1/transaction
+    - GET v1/transaction/:ID
+    - POST v1/transaction
+
