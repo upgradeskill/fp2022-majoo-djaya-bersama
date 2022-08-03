@@ -4,6 +4,7 @@ import (
 	"errors"
 	"mini-pos/database"
 	"mini-pos/dto"
+	"mini-pos/util"
 	"time"
 
 	"gorm.io/gorm"
@@ -30,12 +31,16 @@ func InitTransactionRepository() TransactionRepository {
 }
 
 func (repo *transactionRepo) Insert(payload dto.Transaction) (data dto.Transaction, err error) {
+	util.Mutex.Lock()
 	err = repo.DB.Create(&payload).Error
+	util.Mutex.Unlock()
 	return payload, err
 }
 
 func (repo *transactionRepo) InsertDetail(payload dto.TransactionDetail) (data dto.TransactionDetail, err error) {
+	util.Mutex.Lock()
 	err = repo.DB.Create(&payload).Error
+	util.Mutex.Unlock()
 	return payload, err
 }
 
