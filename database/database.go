@@ -23,6 +23,12 @@ func SetupModels() *gorm.DB {
 	}
 	err = DB.AutoMigrate(
 		&dto.User{},
+		&dto.Category{},
+		&dto.Outlet{},
+		&dto.Product{},
+		&dto.OutletProduct{},
+		&dto.Transaction{},
+		&dto.TransactionDetail{},
 	)
 
 	if err != nil {
