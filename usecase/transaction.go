@@ -1,7 +1,6 @@
 package usecase
 
 import (
-	"fmt"
 	"mini-pos/dto"
 	"mini-pos/repository"
 	"mini-pos/util"
@@ -15,6 +14,7 @@ type TransactionUseCase interface {
 	GetAll(echo.Context) ([]dto.TransactionResponse, error)
 	GetDetailByID(echo.Context, uint) (dto.TransactionDetailResponse, error)
 	Update(ctx echo.Context) (dto.TransactionPayload, []dto.ValidationMessage, error)
+	SavePayment(ctx echo.Context) (dto.Transaction, []dto.ValidationMessage, error)
 }
 
 type transactionUseCase struct {
@@ -193,9 +193,6 @@ func (uc *transactionUseCase) Update(ctx echo.Context) (payload dto.TransactionP
 		return
 	}
 
-	fmt.Println(payload.TransactionID)
-	fmt.Println(transaction)
-
 	// update values
 	if payload.OrderNumber != "" {
 		transaction.OrderNumber = payload.OrderNumber
@@ -220,6 +217,31 @@ func (uc *transactionUseCase) Update(ctx echo.Context) (payload dto.TransactionP
 	transaction.IsStatus = payload.IsStatus
 
 	if transaction, err = uc.transactionRepository.Update(payload.ToModel()); err != nil {
+		return
+	}
+
+	return
+}
+
+func (uc *transactionUseCase) SavePayment(ctx echo.Context) (data dto.Transaction, invalidParameter []dto.ValidationMessage, err error) {
+	var payload dto.PaymentPayload
+	if err = ctx.Bind(&payload); err != nil {
+		return
+	}
+
+	// validation
+	if payload.PaymentNumber == "" {
+		invalidParameter = append(invalidParameter, dto.ValidationMessage{Parameter: "order_number", Message: "order_number is required"})
+	}
+	if payload.PaymentNominal.String() == "" {
+		invalidParameter = append(invalidParameter, dto.ValidationMessage{Parameter: "order_number", Message: "order_number is required"})
+	}
+
+	if len(invalidParameter) > 0 {
+		return
+	}
+
+	if data, err = uc.transactionRepository.SavePayment(payload); err != nil {
 		return
 	}
 
