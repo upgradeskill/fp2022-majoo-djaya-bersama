@@ -20,20 +20,20 @@ type ProductUseCase interface {
 }
 
 type productUseCase struct {
-	productRepository      repository.ProductRepository
+	productRepository   repository.ProductRepository
 	authorizeRepository repository.AuthorizeRepository
 	jwtService          security.JWTService
 }
 
 func InitProductUseCase(productRepository repository.ProductRepository, authorizeRepository repository.AuthorizeRepository, jwtService security.JWTService) ProductUseCase {
 	return &productUseCase{
-		productRepository: productRepository,
+		productRepository:   productRepository,
 		authorizeRepository: authorizeRepository,
-		jwtService: jwtService,
+		jwtService:          jwtService,
 	}
 }
 
-func (pc *productUseCase) ProductList(page int, pageSize int, claims *dto.UserClaims) ([]dto.Product, []dto.ValidationMessage, error)  {
+func (pc *productUseCase) ProductList(page int, pageSize int, claims *dto.UserClaims) ([]dto.Product, []dto.ValidationMessage, error) {
 	if claims.Role == 1 {
 		err := pc.authorizeRepository.OwnerAuthorize(claims.Id, uint(1))
 		if err != nil {
@@ -57,7 +57,7 @@ func (pc *productUseCase) ProductList(page int, pageSize int, claims *dto.UserCl
 	return products, nil, nil
 }
 
-func (pc *productUseCase) ProductShow(id uint, claims *dto.UserClaims) (dto.Product, []dto.ValidationMessage, error)  {
+func (pc *productUseCase) ProductShow(id uint, claims *dto.UserClaims) (dto.Product, []dto.ValidationMessage, error) {
 	if claims.Role == 1 {
 		err := pc.authorizeRepository.OwnerAuthorize(claims.Id, uint(1))
 		if err != nil {
@@ -129,7 +129,7 @@ func (pc *productUseCase) ProductInsert(ctx echo.Context, claims *dto.UserClaims
 		return dto.Product{}, invalidParameter, nil
 	}
 
-	payload.IsActive = true
+	payload.IsActive = dto.IsActive{IsActive: 1}
 	payload.CreatedBy = claims.Id
 
 	response, err := pc.productRepository.Insert(payload)
@@ -148,12 +148,12 @@ func (pc *productUseCase) ProductUpdate(ctx echo.Context, claims *dto.UserClaims
 		log.Println(err)
 		return payload, nil, errors.New("failed to bind parametes")
 	}
-	
+
 	//validation
 	if payload.Id <= 0 {
 		invalidParameter = append(invalidParameter, dto.ValidationMessage{Parameter: "id", Message: "id is required"})
 	}
-	
+
 	if payload.CategoryId == 0 {
 		invalidParameter = append(invalidParameter, dto.ValidationMessage{Parameter: "category_id", Message: "category_id is required"})
 	}
@@ -190,7 +190,7 @@ func (pc *productUseCase) ProductUpdate(ctx echo.Context, claims *dto.UserClaims
 		return dto.Product{}, invalidParameter, nil
 	}
 
-	payload.IsActive = true
+	payload.IsActive = dto.IsActive{IsActive: 1}
 	payload.UpdatedBy = claims.Id
 
 	response, err := pc.productRepository.Update(payload)
@@ -203,7 +203,7 @@ func (pc *productUseCase) ProductUpdate(ctx echo.Context, claims *dto.UserClaims
 func (pc *productUseCase) ProductDelete(id uint, claims *dto.UserClaims) (dto.Product, []dto.ValidationMessage, error) {
 	var invalidParameter []dto.ValidationMessage
 	product := dto.Product{}
-	
+
 	//validation
 	if id == 0 {
 		invalidParameter = append(invalidParameter, dto.ValidationMessage{Parameter: "id", Message: "id is required"})
