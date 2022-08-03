@@ -7,7 +7,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func GetAuthClaims(ctx echo.Context) *dto.UserClaims  {
+func GetAuthClaims(ctx echo.Context) *dto.UserClaims {
 	user := ctx.Get("user").(*jwt.Token)
 	return user.Claims.(*dto.UserClaims)
 }

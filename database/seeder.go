@@ -68,7 +68,7 @@ func categorySeeder() error {
 
 func productSeeder() error {
 	product := dto.Product{
-		CategoryID:  1,
+		CategoryId:  1,
 		Name:        "Product Test",
 		Description: "",
 		ImagePath:   "",
