@@ -108,3 +108,13 @@ type TransactionDetailResponse struct {
 	Transaction       TransactionResponse        `json:"transaction"`
 	TransactionDetail []TransactionDetailPayload `json:"transaction_detail"`
 }
+
+type PaymentPayload struct {
+	TransactionID  uint            `json:"transaction_id" form:"transaction_id"`
+	PaymentNumber  string          `json:"payment_number" form:"payment_number"`
+	PaymentDate    time.Time       `json:"payment_date" form:"payment_date"`
+	PaymentNominal decimal.Decimal `json:"payment_nominal" form:"payment_nominal" gorm:"type:decimal(12,2)"`
+	PaymentMethod  uint            `json:"payment_method" form:"payment_method"`
+	PaymentNote    string          `json:"payment_note" form:"payment_note"`
+	IsStatus       uint            `json:"is_status" form:"is_status"`
+}

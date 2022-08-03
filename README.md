@@ -30,4 +30,6 @@
     - GET v1/transaction
     - GET v1/transaction/:ID
     - POST v1/transaction
+    - PUT v1/transaction
+    - POST v1/transaction/payment
 

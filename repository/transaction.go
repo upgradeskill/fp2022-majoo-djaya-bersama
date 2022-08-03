@@ -4,6 +4,7 @@ import (
 	"errors"
 	"mini-pos/database"
 	"mini-pos/dto"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -15,6 +16,7 @@ type TransactionRepository interface {
 	GetByID(uint) (dto.Transaction, error)
 	GetDetail(dto.TransactionPayload) ([]dto.TransactionDetail, error)
 	Update(dto.Transaction) (dto.Transaction, error)
+	SavePayment(dto.PaymentPayload) (dto.Transaction, error)
 }
 
 type transactionRepo struct {
@@ -61,10 +63,37 @@ func (repo *transactionRepo) Update(payload dto.Transaction) (data dto.Transacti
 		return data, errors.New("transaction not found")
 	}
 
+	// if time updated at is not same, possibly the data already updated by another user
+	if payload.UpdatedAt != data.UpdatedAt && !payload.UpdatedAt.IsZero() {
+		return data, errors.New("please refresh to sync the data first")
+	}
+
 	// set data from payload
 	data = payload
 
 	// save data
 	err = repo.DB.Save(&data).Error
 	return payload, err
+}
+
+func (repo *transactionRepo) SavePayment(payload dto.PaymentPayload) (data dto.Transaction, err error) {
+	if err = repo.DB.First(&data, payload.TransactionID).Error; err != nil {
+		return
+	}
+
+	if data.Id == 0 {
+		return data, errors.New("transaction not found")
+	}
+
+	// set data from payload
+	data.PaymentNumber = payload.PaymentNumber
+	data.PaymentDate = time.Now()
+	data.PaymentNominal = payload.PaymentNominal
+	data.PaymentMethod = payload.PaymentMethod
+	data.PaymentNote = payload.PaymentNote
+	data.IsStatus = 1
+
+	// save data
+	err = repo.DB.Save(&data).Error
+	return data, err
 }

@@ -28,6 +28,8 @@ func TransactionApi(e *echo.Group) {
 	e.GET("/transaction/:ID", transactionHandler.TransactionGetDetail)
 	e.POST("/transaction", transactionHandler.TransactionInsert)
 	e.PUT("/transaction", transactionHandler.TransactionUpdate)
+	e.POST("/transaction/payment", transactionHandler.TransactionSavePayment)
+
 }
 
 func (hand *TransactionHandler) TransactionInsert(c echo.Context) error {
@@ -56,5 +58,10 @@ func (hand *TransactionHandler) TransactionGetDetail(c echo.Context) error {
 
 func (hand *TransactionHandler) TransactionUpdate(c echo.Context) error {
 	data, validate, err := hand.transactionUseCase.Update(c)
+	return SetupResponsePost(c, data, validate, err)
+}
+
+func (hand *TransactionHandler) TransactionSavePayment(c echo.Context) error {
+	data, validate, err := hand.transactionUseCase.SavePayment(c)
 	return SetupResponsePost(c, data, validate, err)
 }
