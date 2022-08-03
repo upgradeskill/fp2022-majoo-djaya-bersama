@@ -32,6 +32,7 @@ func RegisterRoutes() {
 	{
 		api.UserApi(v1)
 		api.TransactionApi(v1)
+		api.OutletApi(v1)
 	}
 
 	if err := e.Start(":8000"); err != http.ErrServerClosed {

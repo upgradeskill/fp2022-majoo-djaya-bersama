@@ -24,6 +24,11 @@
     - PUT v1/user
     - DELETE v1/user/:ID
  - Outlet
+    - GET v1/outlet
+    - GET v1/outlet/:ID
+    - POST v1/outlet
+    - PUT v1/outlet
+    - DELETE v1/outlet/:ID
  - Category
  - Product
  - Transaction
