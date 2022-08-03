@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"mini-pos/database"
 	"mini-pos/dto"
 
@@ -13,6 +14,7 @@ type TransactionRepository interface {
 	GetAll(dto.Transaction, dto.Pagination) ([]dto.Transaction, error)
 	GetByID(uint) (dto.Transaction, error)
 	GetDetail(dto.TransactionPayload) ([]dto.TransactionDetail, error)
+	Update(dto.Transaction) (dto.Transaction, error)
 }
 
 type transactionRepo struct {
@@ -48,4 +50,21 @@ func (repo *transactionRepo) GetByID(id uint) (data dto.Transaction, err error) 
 func (repo *transactionRepo) GetDetail(payload dto.TransactionPayload) (data []dto.TransactionDetail, err error) {
 	err = repo.DB.Find(&data, payload).Error
 	return
+}
+
+func (repo *transactionRepo) Update(payload dto.Transaction) (data dto.Transaction, err error) {
+	if err = repo.DB.First(&data, payload.Id).Error; err != nil {
+		return
+	}
+
+	if data.Id == 0 {
+		return data, errors.New("transaction not found")
+	}
+
+	// set data from payload
+	data = payload
+
+	// save data
+	err = repo.DB.Save(&data).Error
+	return payload, err
 }

@@ -62,6 +62,9 @@ type TransactionPayload struct {
 
 func (payload *TransactionPayload) ToModel() Transaction {
 	return Transaction{
+		Model: Model{
+			Id: payload.TransactionID,
+		},
 		OutletID:       payload.OutletID,
 		UserID:         payload.UserID,
 		OrderNumber:    payload.OrderNumber,

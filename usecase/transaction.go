@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"fmt"
 	"mini-pos/dto"
 	"mini-pos/repository"
 	"mini-pos/util"
@@ -13,6 +14,7 @@ type TransactionUseCase interface {
 	Insert(echo.Context) (dto.TransactionPayload, []dto.ValidationMessage, error)
 	GetAll(echo.Context) ([]dto.TransactionResponse, error)
 	GetDetailByID(echo.Context, uint) (dto.TransactionDetailResponse, error)
+	Update(ctx echo.Context) (dto.TransactionPayload, []dto.ValidationMessage, error)
 }
 
 type transactionUseCase struct {
@@ -34,7 +36,6 @@ func (uc *transactionUseCase) Insert(ctx echo.Context) (data dto.TransactionPayl
 	}
 
 	// validation
-	// TODO: validate payload
 	if data.OrderNumber == "" {
 		invalidParameter = append(invalidParameter, dto.ValidationMessage{Parameter: "order_number", Message: "order_number is required"})
 	}
@@ -46,7 +47,11 @@ func (uc *transactionUseCase) Insert(ctx echo.Context) (data dto.TransactionPayl
 	// setup data
 	data.UserID = util.GetSessionByName(ctx, "user_id").(uint)
 	data.OrderDate = time.Now()
-	data.PaymentDate = time.Now()
+
+	// if status == 1 -> paid, then set payment date is now
+	if data.IsStatus == 1 {
+		data.PaymentDate = time.Now()
+	}
 
 	var transaction dto.Transaction
 	if transaction, err = uc.transactionRepository.Insert(data.ToModel()); err != nil {
@@ -72,7 +77,6 @@ func (uc *transactionUseCase) Insert(ctx echo.Context) (data dto.TransactionPayl
 	}
 
 	return
-
 }
 
 func (uc *transactionUseCase) GetAll(ctx echo.Context) (data []dto.TransactionResponse, err error) {
@@ -158,6 +162,65 @@ func (uc *transactionUseCase) GetDetailByID(ctx echo.Context, id uint) (data dto
 			Quantity:        detail_transaction.Quantity,
 			Price:           detail_transaction.Price,
 		})
+	}
+
+	return
+}
+
+func (uc *transactionUseCase) Update(ctx echo.Context) (payload dto.TransactionPayload, invalidParameter []dto.ValidationMessage, err error) {
+
+	if err = ctx.Bind(&payload); err != nil {
+		return
+	}
+
+	// validation
+	if payload.OrderNumber == "" {
+		invalidParameter = append(invalidParameter, dto.ValidationMessage{Parameter: "order_number", Message: "order_number is required"})
+	}
+	if payload.TransactionID <= 0 {
+		invalidParameter = append(invalidParameter, dto.ValidationMessage{Parameter: "transaction_id", Message: "invalid transaction_id"})
+	}
+
+	if len(invalidParameter) > 0 {
+		return
+	}
+
+	// setup data
+	payload.UserID = util.GetSessionByName(ctx, "user_id").(uint)
+
+	var transaction dto.Transaction
+	if transaction, err = uc.transactionRepository.GetByID(payload.TransactionID); err != nil {
+		return
+	}
+
+	fmt.Println(payload.TransactionID)
+	fmt.Println(transaction)
+
+	// update values
+	if payload.OrderNumber != "" {
+		transaction.OrderNumber = payload.OrderNumber
+	}
+	if payload.OrderNominal.String() != "" {
+		transaction.OrderNominal = payload.OrderNominal
+	}
+	if payload.PaymentNumber != "" {
+		transaction.PaymentNumber = payload.PaymentNumber
+	}
+	if !payload.PaymentDate.IsZero() {
+		transaction.PaymentDate = payload.PaymentDate
+	}
+	if payload.PaymentNominal.String() != "" {
+		transaction.PaymentNominal = payload.PaymentNominal
+	}
+	transaction.PaymentMethod = payload.PaymentMethod
+
+	if payload.PaymentNote != "" {
+		transaction.PaymentNote = payload.PaymentNote
+	}
+	transaction.IsStatus = payload.IsStatus
+
+	if transaction, err = uc.transactionRepository.Update(payload.ToModel()); err != nil {
+		return
 	}
 
 	return
