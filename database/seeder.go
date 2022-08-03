@@ -4,6 +4,8 @@ import (
 	"errors"
 	"mini-pos/dto"
 	"mini-pos/util"
+	"strconv"
+	"time"
 
 	"github.com/shopspring/decimal"
 )
@@ -14,6 +16,7 @@ func initSeeder() error {
 	categorySeeder()
 	productSeeder()
 	outletProductSeeder()
+	transactionSeeder()
 	return nil
 }
 
@@ -90,6 +93,38 @@ func outletProductSeeder() error {
 	err := DB.Create(&outletProduct).Error
 	if err != nil {
 		return errors.New("failed to seed outlet product data")
+	}
+
+	return nil
+}
+
+func transactionSeeder() error {
+	for i := 1; i <= 10; i++ {
+		transaction := dto.Transaction{
+			OutletID:     1,
+			UserID:       1,
+			OrderNumber:  strconv.Itoa(i),
+			OrderDate:    time.Now(),
+			OrderNominal: decimal.NewFromInt((5000)),
+		}
+		err := DB.Create(&transaction).Error
+		if err != nil {
+			return errors.New("failed to seed transaction data")
+		}
+
+		detailTransaction := dto.TransactionDetail{
+			TransactionID:   transaction.Id,
+			OutletProductID: 1,
+			ProductName:     "Product Test",
+			Quantity:        1,
+			Price:           decimal.NewFromInt((5000)),
+		}
+
+		err = DB.Create(&detailTransaction).Error
+		if err != nil {
+			return errors.New("failed to seed transaction detail data")
+		}
+
 	}
 
 	return nil

@@ -4,6 +4,7 @@ import (
 	"mini-pos/repository"
 	"mini-pos/usecase"
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 )
@@ -14,7 +15,8 @@ type TransactionHandler struct {
 
 func NewTransactionHandler() *TransactionHandler {
 	transactionRepo := repository.InitTransactionRepository()
-	transactionUseCase := usecase.InitTransactionUseCase(transactionRepo)
+	productRepo := repository.InitProductRepository()
+	transactionUseCase := usecase.InitTransactionUseCase(transactionRepo, productRepo)
 	return &TransactionHandler{
 		transactionUseCase: transactionUseCase,
 	}
@@ -23,39 +25,30 @@ func NewTransactionHandler() *TransactionHandler {
 func TransactionApi(e *echo.Group) {
 	transactionHandler := NewTransactionHandler()
 	e.GET("/transaction", transactionHandler.TransactionGet)
+	e.GET("/transaction/:ID", transactionHandler.TransactionGetDetail)
 	e.POST("/transaction", transactionHandler.TransactionInsert)
 }
 
 func (hand *TransactionHandler) TransactionInsert(c echo.Context) error {
-	resp := make(map[string]interface{})
 	data, validate, err := hand.transactionUseCase.Insert(c)
-
-	if validate != nil {
-		resp["message"] = "invalid parameters"
-		resp["error_validation"] = validate
-		return c.JSON(http.StatusBadRequest, resp)
-	}
-
-	if err != nil {
-		resp["message"] = err.Error()
-		return c.JSON(http.StatusNotFound, resp)
-	}
-
-	resp["message"] = "Success"
-	resp["data"] = data
-	return c.JSON(http.StatusOK, resp)
+	return SetupResponsePost(c, data, validate, err)
 }
 
 func (hand *TransactionHandler) TransactionGet(c echo.Context) error {
-	resp := make(map[string]interface{})
 	data, err := hand.transactionUseCase.GetAll(c)
+	return SetupResponseGet(c, data, err)
+}
 
+func (hand *TransactionHandler) TransactionGetDetail(c echo.Context) error {
+	resp := make(map[string]interface{})
+
+	id, err := strconv.Atoi(c.Param("ID"))
 	if err != nil {
-		resp["message"] = err.Error()
-		return c.JSON(http.StatusNotFound, resp)
+		resp["message"] = "invalid id"
+		return c.JSON(http.StatusBadRequest, resp)
 	}
 
-	resp["message"] = "Success"
-	resp["data"] = data
-	return c.JSON(http.StatusOK, resp)
+	data, err := hand.transactionUseCase.GetDetailByID(c, uint(id))
+
+	return SetupResponseGet(c, data, err)
 }

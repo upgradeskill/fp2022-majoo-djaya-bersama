@@ -11,9 +11,8 @@ type TransactionRepository interface {
 	Insert(dto.Transaction) (dto.Transaction, error)
 	InsertDetail(dto.TransactionDetail) (dto.TransactionDetail, error)
 	GetAll(dto.Transaction, dto.Pagination) ([]dto.Transaction, error)
-	// Update(dto.Transaction) (dto.Transaction, error)
-	// Login(username string, password string) (dto.User, error)
-	// DeleteByID(ID uint) (data dto.User, err error)
+	GetByID(uint) (dto.Transaction, error)
+	GetDetail(dto.TransactionPayload) ([]dto.TransactionDetail, error)
 }
 
 type transactionRepo struct {
@@ -41,44 +40,12 @@ func (repo *transactionRepo) GetAll(payload dto.Transaction, pagination dto.Pagi
 	return
 }
 
-func (repo *transactionRepo) GetDetail(ID int) (data dto.TransactionPayload, err error) {
-	err = repo.DB.Preload("Outlet").Find(&data, ID).Error
+func (repo *transactionRepo) GetByID(id uint) (data dto.Transaction, err error) {
+	err = repo.DB.Find(&data, id).Error
 	return
 }
 
-// func (repo *transactionRepo) Update(payload dto.User) (data dto.User, err error) {
-
-// 	// get book by id
-// 	if err = repo.DB.First(&data, payload.Id).Error; err != nil {
-// 		return
-// 	}
-
-// 	// update value
-// 	data.Name = payload.Name
-// 	data.Username = payload.Username
-// 	if payload.Password != "" {
-// 		data.Password, err = util.HashPassword(payload.Password)
-// 		if err != nil {
-// 			return dto.User{}, err
-// 		}
-// 	}
-// 	data.PhoneNumber = payload.PhoneNumber
-// 	data.IsRole = payload.IsRole
-// 	data.IsActive = payload.IsActive
-// 	data.UpdatedAt = time.Now()
-
-// 	// update book data
-// 	err = repo.DB.Save(&data).Error
-// 	return
-// }
-
-// func (repo *transactionRepo) DeleteByID(ID uint) (data dto.User, err error) {
-// 	// get book by id
-// 	if err = repo.DB.First(&data, ID).Error; err != nil {
-// 		return
-// 	}
-
-// 	// delete book
-// 	err = repo.DB.Delete(&data, ID).Error
-// 	return
-// }
+func (repo *transactionRepo) GetDetail(payload dto.TransactionPayload) (data []dto.TransactionDetail, err error) {
+	err = repo.DB.Find(&data, payload).Error
+	return
+}

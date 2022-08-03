@@ -16,5 +16,5 @@ func InitPagination() Pagination {
 }
 
 func (pagination *Pagination) Apply(db *gorm.DB) *gorm.DB {
-	return db.Offset(pagination.Page * pagination.Limit).Limit(pagination.Limit)
+	return db.Offset((pagination.Page - 1) * pagination.Limit).Limit(pagination.Limit)
 }

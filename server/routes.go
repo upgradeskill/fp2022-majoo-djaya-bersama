@@ -18,7 +18,6 @@ func RegisterRoutes() {
 
 	// for public (unauthorized user)
 	{
-		api.TransactionApi(v1)
 		api.Authorization(v1)
 	}
 
@@ -32,6 +31,7 @@ func RegisterRoutes() {
 	// for authorized user
 	{
 		api.UserApi(v1)
+		api.TransactionApi(v1)
 	}
 
 	if err := e.Start(":8000"); err != http.ErrServerClosed {
