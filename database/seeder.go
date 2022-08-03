@@ -2,12 +2,16 @@ package database
 
 import (
 	"errors"
+	"math/rand"
 	"mini-pos/dto"
 	"mini-pos/util"
+
+	"github.com/icrowley/fake"
 )
 
 func initSeeder() error {
 	userSeeder()
+	productSeeder()
 	return nil
 }
 
@@ -27,5 +31,26 @@ func userSeeder() error {
 	if err != nil {
 		return errors.New("failed to seed user data")
 	}
+	return nil
+}
+
+func productSeeder() error {
+	products := []dto.Product{}
+
+	err := fake.SetLang("en")
+	if err != nil {
+		panic(err)
+	}
+
+	for i := 0; i < 100; i++ {
+		products = append(products, dto.Product{
+			CategoryId: uint(rand.Intn(5)),
+			Name: fake.ProductName(),
+			Description: fake.Words(),
+			ImagePath: fake.Word(),
+		})
+	}
+
+	DB.Create(&products)
 	return nil
 }
