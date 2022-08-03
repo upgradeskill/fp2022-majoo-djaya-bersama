@@ -31,6 +31,7 @@ func RegisterRoutes() {
 	// for authorized user
 	{
 		api.UserApi(v1)
+		api.ProductApi(v1)
 		api.TransactionApi(v1)
 	}
 

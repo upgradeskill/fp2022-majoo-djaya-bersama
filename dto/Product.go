@@ -1,5 +1,6 @@
 package dto
 
+
 import "github.com/shopspring/decimal"
 
 type Product struct {
