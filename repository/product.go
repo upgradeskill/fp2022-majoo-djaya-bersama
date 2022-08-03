@@ -14,6 +14,7 @@ type ProductRepository interface {
 	Insert(dto.Product) (dto.Product, error)
 	Update(dto.Product) (dto.Product, error)
 	DeleteByID(ID uint) (data dto.Product, err error)
+	GetOutletProductByID(ID int) (dto.OutletProduct, error)
 }
 
 type productRepo struct {
@@ -81,5 +82,10 @@ func (repo *productRepo) DeleteByID(ID uint) (data dto.Product, err error) {
 
 	// delete book
 	err = repo.DB.Delete(&data, ID).Error
+	return
+}
+
+func (repo *productRepo) GetOutletProductByID(ID int) (data dto.OutletProduct, err error) {
+	err = repo.DB.Preload("Product").Find(&data, ID).Error
 	return
 }

@@ -75,6 +75,13 @@ func (uc *userUseCase) Login(ctx echo.Context) (dto.LoginResponse, []dto.Validat
 		return dto.LoginResponse{}, nil, errors.New("failed to generate token")
 	}
 
+	// save logged user into session
+	session, _ := util.SessionStore.Get(ctx.Request(), util.SESSION_ID)
+	session.Values["user_id"] = user.Id
+	session.Values["is_role"] = user.IsRole
+	session.Values["username"] = user.Username
+	session.Save(ctx.Request(), ctx.Response())
+
 	return response, nil, nil
 
 }
@@ -105,7 +112,7 @@ func (uc *userUseCase) Register(ctx echo.Context) (dto.User, []dto.ValidationMes
 		invalidParameter = append(invalidParameter, dto.ValidationMessage{Parameter: "phone_number", Message: "password is required"})
 	}
 
-	payload.IsActive = 1
+	payload.IsActive = dto.IsActive{IsActive: 1}
 	payload.IsRole = 1
 
 	if len(invalidParameter) > 0 {
@@ -179,7 +186,7 @@ func (uc *userUseCase) UserInsert(ctx echo.Context, claims *dto.UserClaims) (dto
 		return dto.User{}, invalidParameter, nil
 	}
 
-	payload.IsActive = 1
+	payload.IsActive = dto.IsActive{IsActive: 1}
 	payload.CreatedBy = claims.Id
 
 	if payload.Password != "" {
@@ -248,7 +255,7 @@ func (uc *userUseCase) UserUpdate(ctx echo.Context, claims *dto.UserClaims) (dto
 		return dto.User{}, invalidParameter, nil
 	}
 
-	payload.IsActive = 1
+	payload.IsActive = dto.IsActive{IsActive: 1}
 	payload.CreatedBy = claims.Id
 
 	if payload.Password != "" {

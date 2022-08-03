@@ -20,3 +20,7 @@ type ValidationMessage struct {
 	Parameter string `json:"parameter"`
 	Message   string `json:"message"`
 }
+
+type IsActive struct {
+	IsActive int `json:"is_active" form:"is_active" gorm:"index:,default:0"`
+}
