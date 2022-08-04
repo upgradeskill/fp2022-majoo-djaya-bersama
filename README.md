@@ -32,6 +32,11 @@
     - PUT v1/outlet
     - DELETE v1/outlet/:ID
  - Category
+    - GET v1/category
+    - GET v1/category/:ID
+    - POST v1/category
+    - PUT v1/category
+    - DELETE v1/category/:ID
  - Product
     - GET v1/products
     - GET v1/products/:ID
