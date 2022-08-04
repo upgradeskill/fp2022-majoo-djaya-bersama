@@ -18,6 +18,7 @@ type TransactionRepository interface {
 	GetDetail(dto.TransactionPayload) ([]dto.TransactionDetail, error)
 	Update(dto.Transaction) (dto.Transaction, error)
 	SavePayment(dto.PaymentPayload) (dto.Transaction, error)
+	Delete(uint) error
 }
 
 type transactionRepo struct {
@@ -101,4 +102,15 @@ func (repo *transactionRepo) SavePayment(payload dto.PaymentPayload) (data dto.T
 	// save data
 	err = repo.DB.Save(&data).Error
 	return data, err
+}
+
+func (repo *transactionRepo) Delete(id uint) (err error) {
+	var data dto.Transaction
+	if err = repo.DB.Find(&data, id).Error; err != nil {
+		return
+	}
+
+	err = repo.DB.Delete(&data, id).Error
+
+	return
 }
