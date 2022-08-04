@@ -44,4 +44,7 @@
     - POST v1/transaction
     - PUT v1/transaction
     - POST v1/transaction/payment
-
+    
+## Document
+- ERD
+https://github.com/upgradeskill/fp2022-majoo-djaya-bersama/blob/main/mini-pos.png
