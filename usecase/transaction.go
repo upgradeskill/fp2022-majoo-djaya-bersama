@@ -16,6 +16,8 @@ type TransactionUseCase interface {
 	GetDetailByID(echo.Context, uint) (dto.TransactionDetailResponse, error)
 	Update(ctx echo.Context) (dto.TransactionPayload, []dto.ValidationMessage, error)
 	SavePayment(ctx echo.Context) (dto.Transaction, []dto.ValidationMessage, error)
+	CancelTransaction(echo.Context, uint) error
+	Delete(echo.Context, uint) error
 }
 
 type transactionUseCase struct {
@@ -128,7 +130,7 @@ func (uc *transactionUseCase) GetDetailByID(ctx echo.Context, id uint) (data dto
 	// set filter transaction id from parameter
 	filter.TransactionID = id
 	// get user id from session
-	userID := util.GetSessionByName(ctx, "user_id").(uint)
+	// userID := util.GetSessionByName(ctx, "user_id").(uint)
 
 	// get transaction
 	var transaction dto.Transaction
@@ -136,10 +138,14 @@ func (uc *transactionUseCase) GetDetailByID(ctx echo.Context, id uint) (data dto
 		return
 	}
 
-	// validate only authorized user can get detail
-	if transaction.UserID != userID {
-		return data, errors.New("unauthorized")
+	if transaction.Id == 0 {
+		return data, errors.New("data not found")
 	}
+
+	// validate only authorized user can get detail
+	// if transaction.UserID != userID {
+	// 	return data, errors.New("unauthorized")
+	// }
 
 	data.Transaction = dto.TransactionResponse{
 		TransactionID:  transaction.Id,
@@ -201,9 +207,9 @@ func (uc *transactionUseCase) Update(ctx echo.Context) (payload dto.TransactionP
 	}
 
 	// validate only authorized user can update
-	if transaction.UserID != payload.UserID {
-		return payload, invalidParameter, errors.New("unauthorized")
-	}
+	// if transaction.UserID != payload.UserID {
+	// 	return payload, invalidParameter, errors.New("unauthorized")
+	// }
 
 	// update values
 	if payload.OrderNumber != "" {
@@ -258,4 +264,23 @@ func (uc *transactionUseCase) SavePayment(ctx echo.Context) (data dto.Transactio
 	}
 
 	return
+}
+
+func (uc *transactionUseCase) CancelTransaction(ctx echo.Context, id uint) (err error) {
+	var transaction dto.Transaction
+	if transaction, err = uc.transactionRepository.GetByID(id); err != nil {
+		return
+	}
+	if transaction.Id <= 0 {
+		return errors.New("transaction not found")
+	}
+	transaction.IsStatus = 9 // cancel
+	if transaction, err = uc.transactionRepository.Update(transaction); err != nil {
+		return err
+	}
+	return
+}
+
+func (uc *transactionUseCase) Delete(ctx echo.Context, id uint) (err error) {
+	return uc.transactionRepository.Delete(id)
 }
