@@ -45,12 +45,12 @@ func InitOutletProductRepository() OutletProductRepository {
 	}
 }
 
-func (repo *productRepo) List(filter dto.Product, pagination dto.Pagination) (data []dto.Product, err error)  {
+func (repo *productRepo) List(filter dto.Product, pagination dto.Pagination) (data []dto.Product, err error) {
 	err = pagination.Apply(repo.DB).Find(&data, filter).Error
 	return
 }
 
-func (repo *productRepo) Show(id uint) (data dto.Product, err error)  {
+func (repo *productRepo) Show(id uint) (data dto.Product, err error) {
 	err = repo.DB.First(&data, id).Error
 	return data, err
 }
@@ -96,17 +96,16 @@ func (repo *productRepo) GetOutletProductByID(ID int) (data dto.OutletProduct, e
 	return
 }
 
+// ========================== Start Outlet Product ==========================
 
-// ========================== Start Outlet Product ========================== 
-
-func (repo *outletProductRepo) List(filter dto.OutletProduct, pagination dto.Pagination) (data []dto.OutletProduct, err error)  {
+func (repo *outletProductRepo) List(filter dto.OutletProduct, pagination dto.Pagination) (data []dto.OutletProduct, err error) {
 	err = pagination.Apply(repo.DB).Find(&data, filter).Error
 	return
 }
 
-func (repo *outletProductRepo) Show(OutletId uint, ProductId uint) (data dto.OutletProduct, err error)  {
+func (repo *outletProductRepo) Show(OutletId uint, ProductId uint) (data dto.OutletProduct, err error) {
 	data = dto.OutletProduct{OutletID: OutletId, ProductID: ProductId}
-	err = repo.DB.First(&data).Where("outlet_id = ? and product_id = ?", OutletId, ProductId).Error
+	err = repo.DB.Preload("Product").First(&data).Where("outlet_id = ? and product_id = ?", OutletId, ProductId).Error
 	return data, err
 }
 
