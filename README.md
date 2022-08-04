@@ -47,4 +47,4 @@
     
 ## Document
 - ERD
-https://github.com/upgradeskill/fp2022-majoo-djaya-bersama/blob/main/mini-pos.png
+![logo](https://github.com/upgradeskill/fp2022-majoo-djaya-bersama/blob/main/mini-pos.png)
