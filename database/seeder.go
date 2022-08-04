@@ -73,11 +73,11 @@ func productSeeder() error {
 	products := []dto.Product{}
 	for i := 0; i < 100; i++ {
 		products = append(products, dto.Product{
-			CategoryID: uint(1),
-			Name: fake.ProductName(),
+			CategoryId : uint(1),
+			Name       : fake.ProductName(),
 			Description: fake.Words(),
-			ImagePath: fake.Word(),
-			IsActive:    dto.IsActive{IsActive: 1},
+			ImagePath  : fake.Word(),
+			IsActive   : dto.IsActive{IsActive: 1},
 		})
 	}
 	err := DB.Create(&products).Error

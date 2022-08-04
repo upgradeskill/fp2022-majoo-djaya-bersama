@@ -1,12 +1,11 @@
 package dto
 
-
 import "github.com/shopspring/decimal"
 
 type Product struct {
 	Model
-	CategoryID  uint     `json:"category_id" form:"category_id"`
-	Category    Category `json:"category" form:"category" gorm:"foreignKey:CategoryID"`
+	CategoryId  uint     `json:"category_id" form:"category_id"`
+	Category    Category `json:"category" form:"category" gorm:"foreignKey:CategoryId"`
 	Name        string   `json:"name" form:"name"`
 	Description string   `json:"description" form:"description"`
 	ImagePath   string   `json:"image_path" form:"image_path"`
