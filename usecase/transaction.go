@@ -88,8 +88,8 @@ func (uc *transactionUseCase) GetAll(ctx echo.Context) (data []dto.TransactionRe
 		return
 	}
 
-	// get user id from session
-	filter.UserID = util.GetSessionByName(ctx, "user_id").(uint)
+	// get outlet id from session (to check authorized user)
+	filter.OutletID = util.GetSessionByName(ctx, "outlet_id").(uint)
 
 	pagination := dto.InitPagination()
 	if err = ctx.Bind(&pagination); err != nil {
@@ -121,6 +121,26 @@ func (uc *transactionUseCase) GetAll(ctx echo.Context) (data []dto.TransactionRe
 	return
 }
 
+func (uc *transactionUseCase) GetAuthorizedTransaction(ctx echo.Context, id uint) (data dto.Transaction, err error) {
+	// get outlet_id from session (to check authorized user)
+	outletID := util.GetSessionByName(ctx, "outlet_id").(uint)
+
+	// get transaction
+	if data, err = uc.transactionRepository.GetByID(id); err != nil {
+		return
+	}
+
+	if data.Id == 0 {
+		return data, errors.New("data not found")
+	}
+
+	// validate only authorized user can get detail
+	if data.OutletID != outletID {
+		return data, errors.New("unauthorized")
+	}
+	return
+}
+
 func (uc *transactionUseCase) GetDetailByID(ctx echo.Context, id uint) (data dto.TransactionDetailResponse, err error) {
 	var filter dto.TransactionPayload
 	if err = ctx.Bind(&filter); err != nil {
@@ -129,23 +149,13 @@ func (uc *transactionUseCase) GetDetailByID(ctx echo.Context, id uint) (data dto
 
 	// set filter transaction id from parameter
 	filter.TransactionID = id
-	// get user id from session
-	// userID := util.GetSessionByName(ctx, "user_id").(uint)
 
-	// get transaction
+	// check permission
 	var transaction dto.Transaction
-	if transaction, err = uc.transactionRepository.GetByID(id); err != nil {
-		return
+	transaction, err = uc.GetAuthorizedTransaction(ctx, id)
+	if err != nil {
+		return data, err
 	}
-
-	if transaction.Id == 0 {
-		return data, errors.New("data not found")
-	}
-
-	// validate only authorized user can get detail
-	// if transaction.UserID != userID {
-	// 	return data, errors.New("unauthorized")
-	// }
 
 	data.Transaction = dto.TransactionResponse{
 		TransactionID:  transaction.Id,
@@ -198,18 +208,12 @@ func (uc *transactionUseCase) Update(ctx echo.Context) (payload dto.TransactionP
 		return
 	}
 
-	// setup data
-	payload.UserID = util.GetSessionByName(ctx, "user_id").(uint)
-
+	// check permission
 	var transaction dto.Transaction
-	if transaction, err = uc.transactionRepository.GetByID(payload.TransactionID); err != nil {
+	transaction, err = uc.GetAuthorizedTransaction(ctx, payload.TransactionID)
+	if err != nil {
 		return
 	}
-
-	// validate only authorized user can update
-	// if transaction.UserID != payload.UserID {
-	// 	return payload, invalidParameter, errors.New("unauthorized")
-	// }
 
 	// update values
 	if payload.OrderNumber != "" {
@@ -259,6 +263,12 @@ func (uc *transactionUseCase) SavePayment(ctx echo.Context) (data dto.Transactio
 		return
 	}
 
+	// check permission
+	_, err = uc.GetAuthorizedTransaction(ctx, payload.TransactionID)
+	if err != nil {
+		return
+	}
+
 	if data, err = uc.transactionRepository.SavePayment(payload); err != nil {
 		return
 	}
@@ -267,13 +277,13 @@ func (uc *transactionUseCase) SavePayment(ctx echo.Context) (data dto.Transactio
 }
 
 func (uc *transactionUseCase) CancelTransaction(ctx echo.Context, id uint) (err error) {
+	// check permission
 	var transaction dto.Transaction
-	if transaction, err = uc.transactionRepository.GetByID(id); err != nil {
+	transaction, err = uc.GetAuthorizedTransaction(ctx, id)
+	if err != nil {
 		return
 	}
-	if transaction.Id <= 0 {
-		return errors.New("transaction not found")
-	}
+
 	transaction.IsStatus = 9 // cancel
 	if transaction, err = uc.transactionRepository.Update(transaction); err != nil {
 		return err
@@ -282,5 +292,10 @@ func (uc *transactionUseCase) CancelTransaction(ctx echo.Context, id uint) (err 
 }
 
 func (uc *transactionUseCase) Delete(ctx echo.Context, id uint) (err error) {
+	// check permission
+	_, err = uc.GetAuthorizedTransaction(ctx, id)
+	if err != nil {
+		return
+	}
 	return uc.transactionRepository.Delete(id)
 }
