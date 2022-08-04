@@ -4,8 +4,11 @@ import (
 	"errors"
 	"mini-pos/dto"
 	"mini-pos/util"
+
 	"strconv"
 	"time"
+
+	"github.com/icrowley/fake"
 
 	"github.com/shopspring/decimal"
 )
@@ -67,14 +70,17 @@ func categorySeeder() error {
 }
 
 func productSeeder() error {
-	product := dto.Product{
-		CategoryId:  1,
-		Name:        "Product Test",
-		Description: "",
-		ImagePath:   "",
-		IsActive:    dto.IsActive{IsActive: 1},
+	products := []dto.Product{}
+	for i := 0; i < 100; i++ {
+		products = append(products, dto.Product{
+			CategoryId : uint(1),
+			Name       : fake.ProductName(),
+			Description: fake.Words(),
+			ImagePath  : fake.Word(),
+			IsActive   : dto.IsActive{IsActive: 1},
+		})
 	}
-	err := DB.Create(&product).Error
+	err := DB.Create(&products).Error
 	if err != nil {
 		return errors.New("failed to seed product data")
 	}
