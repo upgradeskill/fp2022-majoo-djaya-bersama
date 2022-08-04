@@ -46,8 +46,8 @@
     - POST v1/transaction/payment
     
 ## Document
-- ERD
+1. ERD
 ![logo](https://github.com/upgradeskill/fp2022-majoo-djaya-bersama/blob/main/mini-pos.png)
 
--Payload Contract
+2. Payload Contract
 https://docs.google.com/document/d/1QqyGVv2Q66K8FYZs5WWWyfLybj-MPRi7d__hAyNSAsk/edit#heading=h.ls6wt2gfcj4p
