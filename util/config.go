@@ -8,13 +8,14 @@ import (
 )
 
 type Config struct {
-	DB_USER     string
-	DB_PASSWORD string
-	DB_NAME     string
-	DB_HOST     string
-	DB_PORT     string
-	JWT_SECRET  string
-	JWT_ISSUER  string
+	DB_USER        string
+	DB_PASSWORD    string
+	DB_NAME        string
+	DB_HOST        string
+	DB_PORT        string
+	JWT_SECRET     string
+	JWT_ISSUER     string
+	SESSION_SECRET string
 }
 
 var GlobalConfig Config
@@ -31,5 +32,6 @@ func LoadConfig() {
 	GlobalConfig.DB_PORT = os.Getenv("DB_PORT")
 	GlobalConfig.JWT_SECRET = os.Getenv("JWT_SECRET")
 	GlobalConfig.JWT_ISSUER = os.Getenv("JWT_ISSUER")
+	GlobalConfig.SESSION_SECRET = os.Getenv("SESSION_SECRET")
 
 }
