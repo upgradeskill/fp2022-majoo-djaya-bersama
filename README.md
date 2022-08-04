@@ -44,10 +44,10 @@
     - POST v1/transaction
     - PUT v1/transaction
     - POST v1/transaction/payment
-    
-## Document
--ERD
+  
+## Document  
+### ERD
 ![image info](https://github.com/upgradeskill/fp2022-majoo-djaya-bersama/blob/main/mini-pos.png)
 
--Payload Contract
+### Payload Contract
 https://docs.google.com/document/d/1QqyGVv2Q66K8FYZs5WWWyfLybj-MPRi7d__hAyNSAsk/edit#heading=h.ls6wt2gfcj4p
