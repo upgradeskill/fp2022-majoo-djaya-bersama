@@ -13,6 +13,7 @@ type Product struct {
 }
 
 type OutletProduct struct {
+	Model
 	OutletID  uint            `json:"outlet_id" form:"outlet_id" gorm:"primaryKey;autoIncrement:false"`
 	Outlet    Outlet          `json:"outlet" form:"outlet" gorm:"foreignKey:OutletID"`
 	ProductID uint            `json:"product_id" form:"product_id" gorm:"primaryKey;autoIncrement:false"`

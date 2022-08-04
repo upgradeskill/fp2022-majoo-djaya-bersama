@@ -47,6 +47,10 @@ func outletSeeder() error {
 		Name:     "Outlet Name",
 		Address:  "Address",
 		IsActive: dto.IsActive{IsActive: 1},
+		Model: dto.Model{
+			CreatedBy: uint(1),
+			CreatedAt: time.Now(),
+		},
 	}
 	err := DB.Create(&outlet).Error
 	if err != nil {
@@ -60,6 +64,10 @@ func categorySeeder() error {
 		Name:        "Item Category Test",
 		Description: "",
 		IsActive:    dto.IsActive{IsActive: 1},
+		Model: dto.Model{
+			CreatedBy: uint(1),
+			CreatedAt: time.Now(),
+		},
 	}
 	err := DB.Create(&category).Error
 	if err != nil {
@@ -78,6 +86,10 @@ func productSeeder() error {
 			Description: fake.Words(),
 			ImagePath  : fake.Word(),
 			IsActive   : dto.IsActive{IsActive: 1},
+			Model: dto.Model{
+				CreatedBy: uint(1),
+				CreatedAt: time.Now(),
+			},
 		})
 	}
 	err := DB.Create(&products).Error
