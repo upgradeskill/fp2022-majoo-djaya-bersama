@@ -51,7 +51,7 @@ func (repo *productRepo) List(filter dto.Product, pagination dto.Pagination) (da
 }
 
 func (repo *productRepo) Show(id uint) (data dto.Product, err error) {
-	err = repo.DB.First(&data, id).Error
+	err = repo.DB.Preload("Category").First(&data, id).Error
 	return data, err
 }
 
@@ -77,6 +77,9 @@ func (repo *productRepo) Update(payload dto.Product) (data dto.Product, err erro
 
 	// update book data
 	err = repo.DB.Save(&data).Error
+	if err = repo.DB.Preload("Category").First(&data, payload.Id).Error; err != nil {
+		return
+	}
 	return
 }
 
