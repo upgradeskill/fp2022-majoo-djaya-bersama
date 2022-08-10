@@ -183,25 +183,31 @@ func (pc *productUseCase) ProductUpdate(ctx echo.Context, claims *dto.UserClaims
 		return payload, nil, errors.New("failed to bind parametes")
 	}
 
-	//validation
-	if payload.Id <= 0 {
-		invalidParameter = append(invalidParameter, dto.ValidationMessage{Parameter: "id", Message: "id is required"})
+	id, err := strconv.Atoi(ctx.Param("ID"))
+	old, err := pc.productRepository.Show(uint(id))
+
+	if err != nil {
+		log.Println(err)
+		return payload, nil, errors.New("failed to get data")
 	}
 
+	payload.Id = old.Id
+
+	//validation
 	if payload.CategoryId == 0 {
-		invalidParameter = append(invalidParameter, dto.ValidationMessage{Parameter: "category_id", Message: "category_id is required"})
+		payload.CategoryId = old.CategoryId
 	}
 
 	if payload.Name == "" {
-		invalidParameter = append(invalidParameter, dto.ValidationMessage{Parameter: "name", Message: "name is required"})
+		payload.Name = old.Name
 	}
 
 	if payload.Description == "" {
-		invalidParameter = append(invalidParameter, dto.ValidationMessage{Parameter: "description", Message: "description is required"})
+		payload.Description = old.Description
 	}
 
 	if payload.ImagePath == "" {
-		invalidParameter = append(invalidParameter, dto.ValidationMessage{Parameter: "image path", Message: "image path is required"})
+		payload.ImagePath = old.ImagePath
 	}
 
 	if claims.Role == 1 {
@@ -224,7 +230,6 @@ func (pc *productUseCase) ProductUpdate(ctx echo.Context, claims *dto.UserClaims
 		return dto.Product{}, invalidParameter, nil
 	}
 
-	payload.IsActive = dto.IsActive{IsActive: 1}
 	payload.UpdatedBy = claims.Id
 
 	response, err := pc.productRepository.Update(payload)
