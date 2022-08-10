@@ -46,7 +46,7 @@ func InitOutletProductRepository() OutletProductRepository {
 }
 
 func (repo *productRepo) List(filter dto.Product, pagination dto.Pagination) (data []dto.Product, err error) {
-	err = pagination.Apply(repo.DB).Find(&data, filter).Error
+	err = pagination.Apply(repo.DB).Preload("Category").Find(&data, filter).Error
 	return
 }
 
@@ -57,7 +57,10 @@ func (repo *productRepo) Show(id uint) (data dto.Product, err error) {
 
 func (repo *productRepo) Insert(payload dto.Product) (data dto.Product, err error) {
 	err = repo.DB.Create(&payload).Error
-	return payload, err
+	if err = repo.DB.Preload("Category").First(&data, payload.Id).Error; err != nil {
+		return
+	}
+	return data, err
 }
 
 func (repo *productRepo) Update(payload dto.Product) (data dto.Product, err error) {
