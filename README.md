@@ -17,9 +17,11 @@
 - Server will run in `localhost:8000`
 
 ## API List
+- Auth
+   - POST v1/login
+   - POST v1/register
+   
  - User
-    - POST v1/login
-    - POST v1/register
     - POST v1/user
     - PUT v1/user
     - DELETE v1/user/:ID
@@ -30,11 +32,27 @@
     - PUT v1/outlet
     - DELETE v1/outlet/:ID
  - Category
+    - GET v1/category
+    - GET v1/category/:ID
+    - POST v1/category
+    - PUT v1/category
+    - DELETE v1/category/:ID
  - Product
+    - GET v1/products
+    - GET v1/products/:ID
+    - POST v1/products
+    - PUT v1/products
+    - DELETE v1/products/:ID
  - Transaction
     - GET v1/transaction
     - GET v1/transaction/:ID
     - POST v1/transaction
     - PUT v1/transaction
     - POST v1/transaction/payment
+  
+## Document  
+### ERD
+![image info](https://github.com/upgradeskill/fp2022-majoo-djaya-bersama/blob/main/mini-pos.png)
 
+### Payload Contract
+https://docs.google.com/document/d/1QqyGVv2Q66K8FYZs5WWWyfLybj-MPRi7d__hAyNSAsk/edit#heading=h.ls6wt2gfcj4p

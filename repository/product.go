@@ -9,7 +9,7 @@ import (
 )
 
 type ProductRepository interface {
-	List(page int, pageSize int) ([]dto.Product, error)
+	List(filter dto.Product, pagination dto.Pagination) ([]dto.Product, error)
 	Show(id uint) (dto.Product, error)
 	Insert(dto.Product) (dto.Product, error)
 	Update(dto.Product) (dto.Product, error)
@@ -17,7 +17,19 @@ type ProductRepository interface {
 	GetOutletProductByID(ID int) (dto.OutletProduct, error)
 }
 
+type OutletProductRepository interface {
+	List(filter dto.OutletProduct, pagination dto.Pagination) ([]dto.OutletProduct, error)
+	Show(OutletId uint, ProductId uint) (dto.OutletProduct, error)
+	Insert(dto.OutletProduct) (dto.OutletProduct, error)
+	Update(dto.OutletProduct) (dto.OutletProduct, error)
+	DeleteByID(OutletId uint, ProductId uint) (data dto.OutletProduct, err error)
+}
+
 type productRepo struct {
+	DB *gorm.DB
+}
+
+type outletProductRepo struct {
 	DB *gorm.DB
 }
 
@@ -27,31 +39,28 @@ func InitProductRepository() ProductRepository {
 	}
 }
 
-func (repo *productRepo) List(page int, pageSize int) (data []dto.Product, err error)  {
-	if page == 0 {
-		page = 1
+func InitOutletProductRepository() OutletProductRepository {
+	return &outletProductRepo{
+		DB: database.DB,
 	}
-
-	switch {
-		case pageSize > 100:
-			pageSize = 100
-		case pageSize <= 0:
-			pageSize = 10
-    }
-
-	offset := (page - 1) * pageSize
-	err = repo.DB.Offset(offset).Limit(pageSize).Find(&data).Error
-	return data, err
 }
 
-func (repo *productRepo) Show(id uint) (data dto.Product, err error)  {
-	err = repo.DB.First(&data, id).Error
+func (repo *productRepo) List(filter dto.Product, pagination dto.Pagination) (data []dto.Product, err error) {
+	err = pagination.Apply(repo.DB).Preload("Category").Find(&data, filter).Error
+	return
+}
+
+func (repo *productRepo) Show(id uint) (data dto.Product, err error) {
+	err = repo.DB.Preload("Category").First(&data, id).Error
 	return data, err
 }
 
 func (repo *productRepo) Insert(payload dto.Product) (data dto.Product, err error) {
 	err = repo.DB.Create(&payload).Error
-	return payload, err
+	if err = repo.DB.Preload("Category").First(&data, payload.Id).Error; err != nil {
+		return
+	}
+	return data, err
 }
 
 func (repo *productRepo) Update(payload dto.Product) (data dto.Product, err error) {
@@ -71,6 +80,9 @@ func (repo *productRepo) Update(payload dto.Product) (data dto.Product, err erro
 
 	// update book data
 	err = repo.DB.Save(&data).Error
+	if err = repo.DB.Preload("Category").First(&data, payload.Id).Error; err != nil {
+		return
+	}
 	return
 }
 
@@ -87,5 +99,51 @@ func (repo *productRepo) DeleteByID(ID uint) (data dto.Product, err error) {
 
 func (repo *productRepo) GetOutletProductByID(ID int) (data dto.OutletProduct, err error) {
 	err = repo.DB.Preload("Product").Find(&data, ID).Error
+	return
+}
+
+// ========================== Start Outlet Product ==========================
+
+func (repo *outletProductRepo) List(filter dto.OutletProduct, pagination dto.Pagination) (data []dto.OutletProduct, err error) {
+	err = pagination.Apply(repo.DB).Find(&data, filter).Error
+	return
+}
+
+func (repo *outletProductRepo) Show(OutletId uint, ProductId uint) (data dto.OutletProduct, err error) {
+	data = dto.OutletProduct{OutletID: OutletId, ProductID: ProductId}
+	err = repo.DB.Preload("Product").First(&data).Where("outlet_id = ? and product_id = ?", OutletId, ProductId).Error
+	return data, err
+}
+
+func (repo *outletProductRepo) Insert(payload dto.OutletProduct) (data dto.OutletProduct, err error) {
+	err = repo.DB.Create(&payload).Error
+	return payload, err
+}
+
+func (repo *outletProductRepo) Update(payload dto.OutletProduct) (data dto.OutletProduct, err error) {
+
+	// get book by id
+	if err = repo.DB.First(&data).Where("outlet_id = ? and product_id = ?", payload.OutletID, payload.ProductID).Error; err != nil {
+		return
+	}
+
+	// update value
+	data.Stock = payload.Stock
+	data.Price = payload.Price
+	data.IsActive = payload.IsActive
+
+	// update book data
+	err = repo.DB.Save(&data).Error
+	return
+}
+
+func (repo *outletProductRepo) DeleteByID(OutletId uint, ProductId uint) (data dto.OutletProduct, err error) {
+	// get book by id
+	if err = repo.DB.First(&data).Where("outlet_id = ? and product_id = ?", OutletId, ProductId).Error; err != nil {
+		return
+	}
+
+	// delete book
+	err = repo.DB.Delete(&data).Error
 	return
 }

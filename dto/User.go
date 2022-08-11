@@ -30,3 +30,9 @@ type UserClaims struct {
 	Role int    `json:"role"`
 	jwt.StandardClaims
 }
+
+type UserMeta struct {
+	TotalRow  int `json:"total_rows"`
+	TotalPage int `json:"total_pages"`
+	Limit     int `json:"limit"`
+}

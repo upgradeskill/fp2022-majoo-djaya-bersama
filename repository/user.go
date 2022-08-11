@@ -2,9 +2,11 @@ package repository
 
 import (
 	"errors"
+	"math"
 	"mini-pos/database"
 	"mini-pos/dto"
 	"mini-pos/util"
+	"strconv"
 	"time"
 
 	"gorm.io/gorm"
@@ -14,7 +16,9 @@ type UserRepository interface {
 	Insert(dto.User) (dto.User, error)
 	Update(dto.User) (dto.User, error)
 	Login(username string, password string) (dto.User, error)
-	DeleteByID(ID uint) (data dto.User, err error)
+	DeleteByID(owner uint, ID uint) (data dto.User, err error)
+	UserByID(owner uint, ID uint) (data dto.User, err error)
+	UserList(owner uint, outlet string, status string, term string, page string, limit string) (data []dto.User, meta dto.UserMeta, err error)
 }
 
 type userRepo struct {
@@ -78,13 +82,61 @@ func (repo *userRepo) Update(payload dto.User) (data dto.User, err error) {
 	return
 }
 
-func (repo *userRepo) DeleteByID(ID uint) (data dto.User, err error) {
+func (repo *userRepo) DeleteByID(owner uint, ID uint) (data dto.User, err error) {
 	// get book by id
-	if err = repo.DB.First(&data, ID).Error; err != nil {
+	if err = repo.DB.Where("created_by = ? ", owner).First(&data, ID).Error; err != nil {
 		return
 	}
 
 	// delete book
-	err = repo.DB.Delete(&data, ID).Error
+	err = repo.DB.Where("created_by = ? ", owner).Delete(&data, ID).Error
 	return
+}
+
+func (repo *userRepo) UserByID(owner uint, ID uint) (data dto.User, err error) {
+	// get book by id
+	if err = repo.DB.Where("created_by = ? ", owner).First(&data, ID).Error; err != nil {
+		return
+	}
+	// delete book
+	return data, nil
+}
+
+func (repo *userRepo) UserList(owner uint, outlet string, status string, term string, page string, limit string) (data []dto.User, meta dto.UserMeta, err error) {
+	query := repo.DB.Where("created_by = ? ", owner)
+	var intLimit int
+	var intPage int
+
+	if outlet != "" {
+		intOutlet, _ := strconv.Atoi(outlet)
+		query.Where("outlet_id = ? ", intOutlet)
+	}
+	if status != "" {
+		intStatus, _ := strconv.Atoi(status)
+		query.Where("status = ? ", intStatus)
+	}
+	if term != "" {
+		query.Where("(id = ? or name Like ? or phone_number Like ?)", term, "%"+term+"%", "%"+term+"%")
+	}
+
+	meta.TotalRow = int(query.Find(&data).RowsAffected)
+
+	if limit != "" {
+		intLimit, _ = strconv.Atoi(limit)
+		query.Limit(intLimit)
+	} else {
+		intLimit = 5
+	}
+	intPage, _ = strconv.Atoi(page)
+	query.Offset((intPage - 1) * intLimit)
+
+	meta.Limit = intLimit
+	meta.TotalPage = int(math.Floor(float64(meta.TotalRow) / float64(intLimit)))
+	if meta.TotalPage < 1 {
+		meta.TotalPage = 1
+	}
+	if err = query.Find(&data).Error; err != nil {
+		return data, dto.UserMeta{}, err
+	}
+	return data, meta, nil
 }

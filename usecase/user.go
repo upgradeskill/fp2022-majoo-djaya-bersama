@@ -7,6 +7,7 @@ import (
 	"mini-pos/repository"
 	"mini-pos/security"
 	"mini-pos/util"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
@@ -18,6 +19,8 @@ type UserUseCase interface {
 	UserInsert(ctx echo.Context, claims *dto.UserClaims) (dto.User, []dto.ValidationMessage, error)
 	UserUpdate(ctx echo.Context, claims *dto.UserClaims) (dto.User, []dto.ValidationMessage, error)
 	UserDelete(id uint, claims *dto.UserClaims) (dto.User, []dto.ValidationMessage, error)
+	UserGetById(id uint, claims *dto.UserClaims) (dto.User, []dto.ValidationMessage, error)
+	UserList(ctx echo.Context, claims *dto.UserClaims) ([]dto.User, dto.UserMeta, error)
 }
 
 type userUseCase struct {
@@ -78,6 +81,7 @@ func (uc *userUseCase) Login(ctx echo.Context) (dto.LoginResponse, []dto.Validat
 	// save logged user into session
 	session, _ := util.SessionStore.Get(ctx.Request(), util.SESSION_ID)
 	session.Values["user_id"] = user.Id
+	session.Values["outlet_id"] = user.OutletId
 	session.Values["is_role"] = user.IsRole
 	session.Values["username"] = user.Username
 	session.Save(ctx.Request(), ctx.Response())
@@ -301,9 +305,59 @@ func (uc *userUseCase) UserDelete(id uint, claims *dto.UserClaims) (dto.User, []
 	if len(invalidParameter) > 0 {
 		return user, invalidParameter, nil
 	}
-	response, err := uc.userRepository.DeleteByID(id)
+	response, err := uc.userRepository.DeleteByID(claims.Id, id)
 	if err != nil {
 		return user, nil, err
 	}
 	return response, nil, nil
+}
+
+func (uc *userUseCase) UserGetById(id uint, claims *dto.UserClaims) (dto.User, []dto.ValidationMessage, error) {
+	var invalidParameter []dto.ValidationMessage
+	user := dto.User{}
+	//validation
+	if id == 0 {
+		invalidParameter = append(invalidParameter, dto.ValidationMessage{Parameter: "id", Message: "id is required"})
+	}
+
+	if len(invalidParameter) > 0 {
+		return user, invalidParameter, nil
+	}
+	response, err := uc.userRepository.UserByID(claims.Id, id)
+	if err != nil {
+		return user, nil, err
+	}
+	return response, nil, nil
+}
+
+func (uc *userUseCase) UserList(ctx echo.Context, claims *dto.UserClaims) ([]dto.User, dto.UserMeta, error) {
+	user := []dto.User{}
+
+	if claims.Role != 1 {
+		return user, dto.UserMeta{}, errors.New("you don't have right")
+	} else {
+		if ctx.QueryParam("outlet_id") != "" {
+			id, _ := strconv.Atoi(ctx.QueryParam("outlet_id"))
+			err := uc.authorizeRepository.OwnerAuthorize(claims.Id, uint(id))
+			if err != nil {
+				if err == gorm.ErrRecordNotFound {
+					return user, dto.UserMeta{}, errors.New("you don't have right")
+				}
+				return user, dto.UserMeta{}, errors.New("failed to authorize")
+			}
+		}
+
+	}
+	user, meta, err := uc.userRepository.UserList(
+		uint(claims.Id),
+		ctx.QueryParam("outlet_id"),
+		ctx.QueryParam("status"),
+		ctx.QueryParam("search"),
+		ctx.QueryParam("page"),
+		ctx.QueryParam("limit"),
+	)
+	if err != nil {
+		return user, dto.UserMeta{}, err
+	}
+	return user, meta, nil
 }

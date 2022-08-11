@@ -29,6 +29,8 @@ func TransactionApi(e *echo.Group) {
 	e.POST("/transaction", transactionHandler.TransactionInsert)
 	e.PUT("/transaction", transactionHandler.TransactionUpdate)
 	e.POST("/transaction/payment", transactionHandler.TransactionSavePayment)
+	e.PUT("/transaction/:ID", transactionHandler.TransactionCancel)
+	e.DELETE("/transaction/:ID", transactionHandler.TransactionDelete)
 
 }
 
@@ -64,4 +66,32 @@ func (hand *TransactionHandler) TransactionUpdate(c echo.Context) error {
 func (hand *TransactionHandler) TransactionSavePayment(c echo.Context) error {
 	data, validate, err := hand.transactionUseCase.SavePayment(c)
 	return SetupResponsePost(c, data, validate, err)
+}
+
+func (hand *TransactionHandler) TransactionCancel(c echo.Context) error {
+	resp := make(map[string]interface{})
+
+	id, err := strconv.Atoi(c.Param("ID"))
+	if err != nil {
+		resp["message"] = "invalid id"
+		return c.JSON(http.StatusBadRequest, resp)
+	}
+
+	err = hand.transactionUseCase.CancelTransaction(c, uint(id))
+
+	return SetupResponseGet(c, nil, err)
+}
+
+func (hand *TransactionHandler) TransactionDelete(c echo.Context) error {
+	resp := make(map[string]interface{})
+
+	id, err := strconv.Atoi(c.Param("ID"))
+	if err != nil {
+		resp["message"] = "invalid id"
+		return c.JSON(http.StatusBadRequest, resp)
+	}
+
+	err = hand.transactionUseCase.Delete(c, uint(id))
+
+	return SetupResponseGet(c, nil, err)
 }

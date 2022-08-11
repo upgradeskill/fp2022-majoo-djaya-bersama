@@ -4,8 +4,11 @@ import (
 	"errors"
 	"mini-pos/dto"
 	"mini-pos/util"
+
 	"strconv"
 	"time"
+
+	"github.com/icrowley/fake"
 
 	"github.com/shopspring/decimal"
 )
@@ -44,6 +47,10 @@ func outletSeeder() error {
 		Name:     "Outlet Name",
 		Address:  "Address",
 		IsActive: dto.IsActive{IsActive: 1},
+		Model: dto.Model{
+			CreatedBy: uint(1),
+			CreatedAt: time.Now(),
+		},
 	}
 	err := DB.Create(&outlet).Error
 	if err != nil {
@@ -57,6 +64,10 @@ func categorySeeder() error {
 		Name:        "Item Category Test",
 		Description: "",
 		IsActive:    dto.IsActive{IsActive: 1},
+		Model: dto.Model{
+			CreatedBy: uint(1),
+			CreatedAt: time.Now(),
+		},
 	}
 	err := DB.Create(&category).Error
 	if err != nil {
@@ -67,14 +78,21 @@ func categorySeeder() error {
 }
 
 func productSeeder() error {
-	product := dto.Product{
-		CategoryId:  1,
-		Name:        "Product Test",
-		Description: "",
-		ImagePath:   "",
-		IsActive:    dto.IsActive{IsActive: 1},
+	products := []dto.Product{}
+	for i := 0; i < 100; i++ {
+		products = append(products, dto.Product{
+			CategoryId : uint(1),
+			Name       : fake.ProductName(),
+			Description: fake.Words(),
+			ImagePath  : fake.Word(),
+			IsActive   : dto.IsActive{IsActive: 1},
+			Model: dto.Model{
+				CreatedBy: uint(1),
+				CreatedAt: time.Now(),
+			},
+		})
 	}
-	err := DB.Create(&product).Error
+	err := DB.Create(&products).Error
 	if err != nil {
 		return errors.New("failed to seed product data")
 	}
