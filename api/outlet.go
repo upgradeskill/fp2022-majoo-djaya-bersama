@@ -2,7 +2,9 @@ package api
 
 import (
 	"mini-pos/repository"
+	"mini-pos/security"
 	"mini-pos/usecase"
+	"mini-pos/util"
 	"net/http"
 	"strconv"
 
@@ -15,7 +17,9 @@ type OutletHandler struct {
 
 func NewOutletHandler() *OutletHandler {
 	outletRepo := repository.InitOutletRepository()
-	outletUseCase := usecase.InitOutletUseCase(outletRepo)
+	authorizeRepo := repository.InitAuthorizeRepository()
+	jwtService := security.JWTAuthService()
+	outletUseCase := usecase.InitOutletUseCase(outletRepo, authorizeRepo, jwtService)
 	return &OutletHandler{
 		outletUseCase: outletUseCase,
 	}
@@ -51,12 +55,12 @@ func (hand *OutletHandler) OutletGetById(c echo.Context) error {
 }
 
 func (hand *OutletHandler) OutletInsert(c echo.Context) error {
-	data, validate, err := hand.outletUseCase.Insert(c)
+	data, validate, err := hand.outletUseCase.Insert(c, util.GetAuthClaims(c))
 	return SetupResponsePost(c, data, validate, err)
 }
 
 func (hand *OutletHandler) OutletUpdate(c echo.Context) error {
-	data, validate, err := hand.outletUseCase.Update(c)
+	data, validate, err := hand.outletUseCase.Update(c, util.GetAuthClaims(c))
 	return SetupResponsePost(c, data, validate, err)
 }
 

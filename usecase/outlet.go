@@ -5,6 +5,7 @@ import (
 	"log"
 	"mini-pos/dto"
 	"mini-pos/repository"
+	"mini-pos/security"
 
 	"github.com/labstack/echo/v4"
 )
@@ -12,18 +13,22 @@ import (
 type OutletUseCase interface {
 	GetAll(echo.Context) ([]dto.OutletResponse, error)
 	GetByID(echo.Context, uint) (dto.OutletResponse, error)
-	Insert(ctx echo.Context) (dto.Outlet, []dto.ValidationMessage, error)
-	Update(ctx echo.Context) (dto.Outlet, []dto.ValidationMessage, error)
+	Insert(ctx echo.Context, claims *dto.UserClaims) (dto.Outlet, []dto.ValidationMessage, error)
+	Update(ctx echo.Context, claims *dto.UserClaims) (dto.Outlet, []dto.ValidationMessage, error)
 	Delete(id uint) (dto.Outlet, []dto.ValidationMessage, error)
 }
 
 type outletUseCase struct {
-	outletRepository repository.OutletRepository
+	outletRepository    repository.OutletRepository
+	authorizeRepository repository.AuthorizeRepository
+	jwtService          security.JWTService
 }
 
-func InitOutletUseCase(outletRepository repository.OutletRepository) OutletUseCase {
+func InitOutletUseCase(outletRepository repository.OutletRepository, authorizeRepository repository.AuthorizeRepository, jwtService security.JWTService) OutletUseCase {
 	return &outletUseCase{
-		outletRepository: outletRepository,
+		outletRepository:    outletRepository,
+		authorizeRepository: authorizeRepository,
+		jwtService:          jwtService,
 	}
 }
 
@@ -75,7 +80,7 @@ func (uc *outletUseCase) GetByID(ctx echo.Context, id uint) (data dto.OutletResp
 	return
 }
 
-func (uc *outletUseCase) Insert(ctx echo.Context) (dto.Outlet, []dto.ValidationMessage, error) {
+func (uc *outletUseCase) Insert(ctx echo.Context, claims *dto.UserClaims) (dto.Outlet, []dto.ValidationMessage, error) {
 	payload := dto.Outlet{}
 	err := ctx.Bind(&payload)
 	var invalidParameter []dto.ValidationMessage
@@ -97,7 +102,7 @@ func (uc *outletUseCase) Insert(ctx echo.Context) (dto.Outlet, []dto.ValidationM
 		return dto.Outlet{}, invalidParameter, nil
 	}
 
-	payload.IsActive = dto.IsActive{IsActive: 1}
+	payload.CreatedBy = claims.Id
 
 	response, err := uc.outletRepository.Insert(payload)
 	if err != nil {
@@ -106,7 +111,7 @@ func (uc *outletUseCase) Insert(ctx echo.Context) (dto.Outlet, []dto.ValidationM
 	return response, nil, nil
 }
 
-func (uc *outletUseCase) Update(ctx echo.Context) (dto.Outlet, []dto.ValidationMessage, error) {
+func (uc *outletUseCase) Update(ctx echo.Context, claims *dto.UserClaims) (dto.Outlet, []dto.ValidationMessage, error) {
 	payload := dto.Outlet{}
 	err := ctx.Bind(&payload)
 	var invalidParameter []dto.ValidationMessage
@@ -132,7 +137,7 @@ func (uc *outletUseCase) Update(ctx echo.Context) (dto.Outlet, []dto.ValidationM
 		return dto.Outlet{}, invalidParameter, nil
 	}
 
-	payload.IsActive = dto.IsActive{IsActive: 1}
+	payload.UpdatedBy = claims.Id
 
 	response, err := uc.outletRepository.Update(payload)
 	if err != nil {

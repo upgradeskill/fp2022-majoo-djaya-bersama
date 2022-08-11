@@ -50,6 +50,7 @@ func (repo *outletRepo) Update(payload dto.Outlet) (data dto.Outlet, err error) 
 	data.Address = payload.Address
 	data.IsActive = payload.IsActive
 	data.UpdatedAt = time.Now()
+	data.UpdatedBy = payload.UpdatedBy
 
 	err = repo.DB.Save(&data).Error
 	return
