@@ -1,3 +1,58 @@
-[![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-c66648af7eb3fe8bc4f294546bfd86ef473780cde1dea487d3c4ff354943c9ae.svg)](https://classroom.github.com/online_ide?assignment_repo_id=8169127&assignment_repo_type=AssignmentRepo)
-# empty
-Empty repo for github classroom starter
+# Majoo Golang Bootcamp
+
+## Setup project
+ - Clone project
+ - Run command
+    ```
+    go mod tidy
+    ```
+
+## Run project
+
+ - Go to root folder
+ - Run command
+    ```
+    go run ./cmd/main.go
+    ```
+- Server will run in `localhost:8000`
+
+## API List
+- Auth
+   - POST v1/login
+   - POST v1/register
+   
+ - User
+    - POST v1/user
+    - PUT v1/user
+    - DELETE v1/user/:ID
+ - Outlet
+    - GET v1/outlet
+    - GET v1/outlet/:ID
+    - POST v1/outlet
+    - PUT v1/outlet
+    - DELETE v1/outlet/:ID
+ - Category
+    - GET v1/category
+    - GET v1/category/:ID
+    - POST v1/category
+    - PUT v1/category
+    - DELETE v1/category/:ID
+ - Product
+    - GET v1/products
+    - GET v1/products/:ID
+    - POST v1/products
+    - PUT v1/products
+    - DELETE v1/products/:ID
+ - Transaction
+    - GET v1/transaction
+    - GET v1/transaction/:ID
+    - POST v1/transaction
+    - PUT v1/transaction
+    - POST v1/transaction/payment
+  
+## Document  
+### ERD
+![image info](https://github.com/upgradeskill/fp2022-majoo-djaya-bersama/blob/main/mini-pos.png)
+
+### Payload Contract
+https://docs.google.com/document/d/1QqyGVv2Q66K8FYZs5WWWyfLybj-MPRi7d__hAyNSAsk/edit#heading=h.ls6wt2gfcj4p

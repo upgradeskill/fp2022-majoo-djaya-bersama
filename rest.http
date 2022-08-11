@@ -1,0 +1,45 @@
+### login
+POST http://localhost:8000/v1/login
+Content-Type: application/json
+
+{
+    "username": "user@mail.com",
+    "password": "Sup3r4dm!n"
+}
+
+### get all data outlet
+GET http://localhost:8000/v1/outlet
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6InVzZXJAbWFpbC5jb20iLCJyb2xlIjoxLCJleHAiOjE2NTk2Mjc1NjIsImlhdCI6MTY1OTU0MTE2MiwiaXNzIjoibWluaS1wb3MifQ.Edtfe0tKj1yf1usfx9-PKv36T6cN4IIBBs_u3D37qMo
+
+### get data outlet by id
+GET http://localhost:8000/v1/outlet/1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6InVzZXJAbWFpbC5jb20iLCJyb2xlIjoxLCJleHAiOjE2NTk2Mjc1NjIsImlhdCI6MTY1OTU0MTE2MiwiaXNzIjoibWluaS1wb3MifQ.Edtfe0tKj1yf1usfx9-PKv36T6cN4IIBBs_u3D37qMo
+
+### create data outlet
+POST http://localhost:8000/v1/outlet
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6InVzZXJAbWFpbC5jb20iLCJyb2xlIjoxLCJleHAiOjE2NTk2Mjc1NjIsImlhdCI6MTY1OTU0MTE2MiwiaXNzIjoibWluaS1wb3MifQ.Edtfe0tKj1yf1usfx9-PKv36T6cN4IIBBs_u3D37qMo
+
+{
+    "name" : "Outlet 2",
+    "address" : "Jakarta"
+}
+
+### update data outlet
+PUT http://localhost:8000/v1/outlet
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6InVzZXJAbWFpbC5jb20iLCJyb2xlIjoxLCJleHAiOjE2NTk2Mjc1NjIsImlhdCI6MTY1OTU0MTE2MiwiaXNzIjoibWluaS1wb3MifQ.Edtfe0tKj1yf1usfx9-PKv36T6cN4IIBBs_u3D37qMo
+
+{
+    "id" : 2,
+    "name" : "Outlet 1",
+    "address" : "Jakarta"
+}
+
+
+### delete data outlet
+DELETE http://localhost:8000/v1/outlet/2
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6InVzZXJAbWFpbC5jb20iLCJyb2xlIjoxLCJleHAiOjE2NTk2Mjc1NjIsImlhdCI6MTY1OTU0MTE2MiwiaXNzIjoibWluaS1wb3MifQ.Edtfe0tKj1yf1usfx9-PKv36T6cN4IIBBs_u3D37qMo

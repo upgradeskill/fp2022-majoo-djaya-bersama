@@ -1,0 +1,138 @@
+##### users #####
+create table `users` (
+	`id` int(11) unsigned not null auto_increment,
+	`outlet_id` int(11) unsigned null,
+	`username` varchar(100) not null,
+	`password` varchar(100) not null,
+	`name` varchar(150) not null,
+	`phone_number` varchar(12) not null,
+	`is_role` int(11) unsigned not null default 0 comment '0=staff, 1=Owner',
+	`is_active` tinyint(1) unsigned not null default 0,
+	`created_at` datetime not null default current_timestamp,
+	`created_by` int(11) unsigned default null,
+	`update_at` datetime default null on update current_timestamp,
+	`updated_by` int(11) unsigned default null,
+	`deleted_at` datetime default null,
+	`deleted_by` int(11) unsigned default null,
+	primary key (`id`),
+	foreign key (`outlet_id`) references `outlets`(`id`),
+	unique key `username` (`username`),
+	unique key `phone_number` (`phone_number`),
+	index (`is_active`)
+) ENGINE = InnoDB default CHARSET = utf8mb4;
+
+##### outlets #####
+create table outlets (
+	`id` int(11) unsigned auto_increment not null,
+	`name` varchar(100) not null,
+	`address` varchar(255) null,
+	`is_active` tinyint(1) unsigned not null default 0,
+	`created_at` datetime not null default current_timestamp,
+	`created_by` int(11) unsigned null,
+	`update_at` datetime null default null on update current_timestamp,
+	`updated_by` int(11) unsigned null,
+	`deleted_at` datetime null,
+	`deleted_by` int(11) unsigned null,
+	primary key (`id`),
+	index (`is_active`)
+) ENGINE = InnoDB default CHARSET = utf8mb4;
+
+##### categories #####
+create table categories (
+	`id` int(11) unsigned auto_increment not null,
+	`name` varchar(100) not null,
+	`description` varchar(255) null,
+	`is_active` tinyint(1) unsigned not null default 0,
+	`created_at` datetime not null default current_timestamp,
+	`created_by` int(11) unsigned null,
+	`update_at` datetime null default null on update current_timestamp,
+	`updated_by` int(11) unsigned null,
+	`deleted_at` datetime null,
+	`deleted_by` int(11) unsigned null,
+	primary key (`id`),
+	index (`is_active`)
+) ENGINE = InnoDB default CHARSET = utf8mb4;
+
+##### products #####
+create table products (
+	`id` int(11) unsigned auto_increment not null,
+	`category_id` int(11) unsigned not null,
+	`name` varchar(100) not null,
+	`description` varchar(255) null,
+	`image_path` varchar(255) null,
+	`is_active` tinyint(1) unsigned not null default 0,
+	`created_at` datetime not null default current_timestamp,
+	`created_by` int(11) unsigned null,
+	`update_at` datetime null default null on update current_timestamp,
+	`updated_by` int(11) unsigned null,
+	`deleted_at` datetime null,
+	`deleted_by` int(11) unsigned null,
+	primary key (`id`),
+	foreign key (`category_id`) references `categories`(`id`),
+	index (`is_active`)
+) ENGINE = InnoDB default CHARSET = utf8mb4;
+
+
+##### outlet_product #####
+create table outlet_product (
+	`outlet_id` int(11) unsigned not null,
+	`product_id` int(11) unsigned not null,
+	`stock` int(11) unsigned not null default 0,
+	`price` decimal(10,2) unsigned not null default 0,
+	`is_active` tinyint(1) unsigned not null default 0,
+	`created_at` datetime not null default current_timestamp,
+	`created_by` int(11) unsigned null,
+	`update_at` datetime null default null on update current_timestamp,
+	`updated_by` int(11) unsigned null,
+	`deleted_at` datetime null,
+	`deleted_by` int(11) unsigned null,
+	primary key (`outlet_id`,`product_id`),
+	foreign key (`outlet_id`) references `outlets` (`id`), 
+  	foreign key (`product_id`) references `products` (`id`),
+	index (`is_active`)
+) ENGINE = InnoDB default CHARSET = utf8mb4;
+
+
+##### transactions #####
+create table transactions (
+	`id` int(11) unsigned auto_increment not null,
+	`outlet_id` int(11) unsigned not null,
+	`user_id` int(11) unsigned not null,
+	`order_number` varchar(20) not null, 
+	`order_date` datetime not null default current_timestamp,
+	`order_nominal` decimal(12,2) not null,
+	`payment_number` varchar(20) null,
+	`payment_date` datetime null,
+	`payment_nominal` decimal(12,2) null,
+	`payment_method` tinyint(1) unsigned null comment '0=cash, 1=bank',
+	`payment_note` varchar(255) null,
+	`is_status` tinyint(1) unsigned not null default 0 comment '0=order, 1=paid, 9=cancel',
+	`created_at` datetime not null default current_timestamp,
+	`created_by` int(11) unsigned null,
+	`update_at` datetime null default null on update current_timestamp,
+	`updated_by` int(11) unsigned null,
+	`deleted_at` datetime null,
+	`deleted_by` int(11) unsigned null,
+	primary key (`id`),
+	foreign key (`outlet_id`) references `outlets` (`id`), 
+  	foreign key (`user_id`) references `users` (`id`)
+) ENGINE = InnoDB default CHARSET = utf8mb4;
+
+##### transaction_details #####
+create table transaction_details (
+	`id` int(11) unsigned auto_increment not null,
+	`transaction_id` int(11) unsigned not null,
+	`product_id` int(11) unsigned not null,
+	`product_name` varchar(100) not null,
+	`quantity` int(11) unsigned not null default 0,
+	`price` decimal(10,2) unsigned not null default 0,
+	`created_at` datetime not null default current_timestamp,
+	`created_by` int(11) unsigned null,
+	`update_at` datetime null default null on update current_timestamp,
+	`updated_by` int(11) unsigned null,
+	`deleted_at` datetime null,
+	`deleted_by` int(11) unsigned null,
+	primary key (`id`),
+	foreign key (`transaction_id`) references `transactions` (`id`), 
+  	foreign key (`product_id`) references `products` (`id`)
+) ENGINE = InnoDB default CHARSET = utf8mb4;
