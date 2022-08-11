@@ -1,7 +1,7 @@
 package dto
 
 import (
-	"mini-pos/util"
+	"mini-pos/helper"
 
 	"gorm.io/gorm"
 )
@@ -12,7 +12,7 @@ type Pagination struct {
 }
 
 func InitPagination() Pagination {
-	return Pagination{Page: util.PAGE, Limit: util.LIMIT}
+	return Pagination{Page: helper.PAGE, Limit: helper.LIMIT}
 }
 
 func (pagination *Pagination) Apply(db *gorm.DB) *gorm.DB {

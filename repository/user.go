@@ -41,7 +41,7 @@ func (repo *userRepo) Login(username string, password string) (response dto.User
 		return
 	}
 
-	if err != nil || util.CheckPasswordHash(password, response.Password) {
+	if err != nil || !util.CheckPasswordHash(password, response.Password) {
 		return dto.User{}, errors.New("incorrect password")
 	}
 	return

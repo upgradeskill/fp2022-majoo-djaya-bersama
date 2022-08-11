@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"errors"
 	"mini-pos/dto"
 	"mini-pos/repository"
 	"mini-pos/util"
@@ -127,13 +128,19 @@ func (uc *transactionUseCase) GetDetailByID(ctx echo.Context, id uint) (data dto
 	// set filter transaction id from parameter
 	filter.TransactionID = id
 	// get user id from session
-	// filter.UserID = util.GetSessionByName(ctx, "user_id").(uint)
+	userID := util.GetSessionByName(ctx, "user_id").(uint)
 
 	// get transaction
 	var transaction dto.Transaction
 	if transaction, err = uc.transactionRepository.GetByID(id); err != nil {
 		return
 	}
+
+	// validate only authorized user can get detail
+	if transaction.UserID != userID {
+		return data, errors.New("unauthorized")
+	}
+
 	data.Transaction = dto.TransactionResponse{
 		TransactionID:  transaction.Id,
 		OutletID:       transaction.OutletID,
@@ -191,6 +198,11 @@ func (uc *transactionUseCase) Update(ctx echo.Context) (payload dto.TransactionP
 	var transaction dto.Transaction
 	if transaction, err = uc.transactionRepository.GetByID(payload.TransactionID); err != nil {
 		return
+	}
+
+	// validate only authorized user can update
+	if transaction.UserID != payload.UserID {
+		return payload, invalidParameter, errors.New("unauthorized")
 	}
 
 	// update values
